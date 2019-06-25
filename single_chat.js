@@ -1,11 +1,15 @@
-// Save this file as single-chat.js
+var discovery = require('discovery-swarm')
+var pump = require('pump')
+
 
 var hypercore = require('hypercore')
 var feed = hypercore('./single-chat-feed', {
   valueEncoding: 'json'
 })
+
+var swarm = discovery()
 process.stdin.on('data', (data) => {
-  feed.append({ 
+  feed.append({
     type: 'chat-message',
     nickname: 'cat-lover',
     text: data.toString().trim(),
@@ -18,5 +22,13 @@ process.stdin.on('data', (data) => {
 
 feed.createReadStream({ live: true })
   .on('data', function (data) {
-    console.log(data)
+  console.log(data)
+})
+
+feed.ready(function () {
+  swarm.join(feed.discoveryKey)
+  swarm.on('connection', (connection) => {
+console.log('new peer connected')
+pump(connection, feed.replicate({ live: true }), connection)
+  })
 })
