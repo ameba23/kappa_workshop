@@ -42,8 +42,10 @@ core.ready(() => {
     })
   })
 
-  core.api.chats.tail(20, (msgs) => {
-    console.log(msgs)
+  core.api.chats.tail(5, (msgs) => {
+    msgs.forEach(msg => {
+      console.log(msg.value.timestamp, msg.value.text)
+    })
   })
 
 
