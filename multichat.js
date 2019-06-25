@@ -24,10 +24,15 @@ multi.writer('local', (err, feed) => {
   })
 })
 
-// feed.createReadStream({ live: true })
-//   .on('data', function (data) {
-//   console.log(data)
-// })
+multi.ready(function () {
+  var feeds = multi.feeds()
+  feeds.forEach(function (feed) {
+    feed.createReadStream({ live: true })
+      .on('data', function (data) {
+        console.log(data)
+      })
+  })
+})
 
 swarm.join('likecabbage')
 swarm.on('connection', (connection) => {
